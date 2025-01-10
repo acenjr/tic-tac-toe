@@ -19,7 +19,6 @@ function App() {
   const [activeBoard, setActiveBoard] = useState(null);
   const [gameWinner, setGameWinner] = useState(null);
   const [scores, setScores] = useState({ X: 0, O: 0 });
-  const [toastMessage, setToastMessage] = useState("");
 
   const checkWinner = (board) => {
     for (let combo of winningCombos) {
@@ -57,14 +56,12 @@ function App() {
       const overallWinner = checkWinner(newBigBoard);
       if (overallWinner) {
         setGameWinner(overallWinner);
-        setToastMessage(`Victory for ${overallWinner}! Game over.`);
         return;
       }
     }
 
     setNextPlayer(nextPlayer === "X" ? "O" : "X");
     setActiveBoard(bigBoard[squareIndex] ? null : squareIndex);
-    setToastMessage(`Next turn: ${nextPlayer === "X" ? "O" : "X"}`);
   };
 
   const resetGame = () => {
@@ -73,7 +70,6 @@ function App() {
     setNextPlayer("X");
     setActiveBoard(null);
     setGameWinner(null);
-    setToastMessage("");
   };
 
   const resetScores = () => {
@@ -82,7 +78,12 @@ function App() {
 
   return (
     <div className="game">
-      {toastMessage && <div className="toast">{toastMessage}</div>}
+      {gameWinner && (
+        <div className="game-over">
+          <h2>Victory for {gameWinner}! Game over.</h2>
+          <button onClick={resetGame}>Restart Game</button>
+        </div>
+      )}
 
       <div className="scoreboard">
         <table>
@@ -130,19 +131,9 @@ function App() {
             </div>
           ))}
         </div>
-
-        <div className="game-actions">
-          {gameWinner && (
-            <div className="game-over">
-              <h2>{toastMessage}</h2>
-              <button onClick={resetGame}>Restart Game</button>
-            </div>
-          )}
-          <button onClick={resetGame} className="reset-button">
-            Reset Game
-          </button>
-        </div>
       </div>
+
+      {!gameWinner && <div className="toast">Next Player: {nextPlayer}</div>}
     </div>
   );
 }
