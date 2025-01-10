@@ -1,137 +1,150 @@
+import React, { useState } from "react";
 import "./App.css";
-import { useState } from "react";
 
-function Square({ value, onSquareClick }) {
-  return (
-    <button className="square" onClick={onSquareClick}>
-      {value}
-    </button>
-  );
-}
+const winningCombos = [
+  [0, 1, 2],
+  [3, 4, 5],
+  [6, 7, 8],
+  [0, 3, 6],
+  [1, 4, 7],
+  [2, 5, 8],
+  [0, 4, 8],
+  [2, 4, 6],
+];
 
-function Board({ xIsNext, squares, onPlay }) {
-  function handleClick(i) {
-    if (squares[i] || calculateWinner(squares)) {
-      return;
-    }
-    const nextSquares = squares.slice();
-    if (xIsNext) {
-      nextSquares[i] = "X";
-    } else {
-      nextSquares[i] = "O";
-    }
+function App() {
+  const [boards, setBoards] = useState(Array(9).fill(Array(9).fill(null)));
+  const [bigBoard, setBigBoard] = useState(Array(9).fill(null));
+  const [nextPlayer, setNextPlayer] = useState("X");
+  const [activeBoard, setActiveBoard] = useState(null);
+  const [gameWinner, setGameWinner] = useState(null);
+  const [scores, setScores] = useState({ X: 0, O: 0 });
+  const [toastMessage, setToastMessage] = useState("");
 
-    onPlay(nextSquares);
-  }
-
-  const winner = calculateWinner(squares);
-
-  let status;
-  if (winner) {
-    status = "Winner: " + winner;
-  } else {
-    status = "Next player: " + (xIsNext ? "X" : "O");
-  }
-
-  return (
-    <>
-      <div className="status">{status}</div>
-      <div className="board-row">
-        <Square value={squares[0]} onSquareClick={() => handleClick(0)} />
-        <Square value={squares[1]} onSquareClick={() => handleClick(1)} />
-        <Square value={squares[2]} onSquareClick={() => handleClick(2)} />
-      </div>
-      <div className="board-row">
-        <Square value={squares[3]} onSquareClick={() => handleClick(3)} />
-        <Square value={squares[4]} onSquareClick={() => handleClick(4)} />
-        <Square value={squares[5]} onSquareClick={() => handleClick(5)} />
-      </div>
-      <div className="board-row">
-        <Square value={squares[6]} onSquareClick={() => handleClick(6)} />
-        <Square value={squares[7]} onSquareClick={() => handleClick(7)} />
-        <Square value={squares[8]} onSquareClick={() => handleClick(8)} />
-      </div>
-    </>
-  );
-}
-
-export default function Game() {
-  const [xIsNext, setXIsNext] = useState(true);
-  const [history, setHistory] = useState([Array(9).fill(null)]);
-  const [xWins, setXWins] = useState(0);
-  const [oWins, setOWins] = useState(0);
-  const currentSquares = history[history.length - 1];
-
-  function handlePlay(nextSquares) {
-    setHistory([...history, nextSquares]);
-    setXIsNext(!xIsNext);
-
-    const winner = calculateWinner(nextSquares);
-    if (winner) {
-      if (winner === "X") {
-        setXWins(xWins + 1);
-      } else if (winner === "O") {
-        setOWins(oWins + 1);
+  const checkWinner = (board) => {
+    for (let combo of winningCombos) {
+      const [a, b, c] = combo;
+      if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+        return board[a];
       }
     }
-  }
+    return null;
+  };
 
-  function restartGame() {
-    setHistory([Array(9).fill(null)]);
-    setXIsNext(true);
-  }
+  const handleClick = (boardIndex, squareIndex) => {
+    if (gameWinner || bigBoard[boardIndex]) return;
+    if (activeBoard !== null && activeBoard !== boardIndex) return;
 
-  function resetTable() {
-    setXWins(0);
-    setOWins(0);
-  }
+    const newBoards = boards.map((board, i) =>
+      i === boardIndex
+        ? board.map((sq, j) => (j === squareIndex ? nextPlayer : sq))
+        : board
+    );
+
+    setBoards(newBoards);
+
+    const smallWinner = checkWinner(newBoards[boardIndex]);
+    if (smallWinner) {
+      const newBigBoard = bigBoard.map((b, i) =>
+        i === boardIndex ? smallWinner : b
+      );
+      setBigBoard(newBigBoard);
+      setScores((prevScores) => ({
+        ...prevScores,
+        [smallWinner]: prevScores[smallWinner] + 1,
+      }));
+
+      const overallWinner = checkWinner(newBigBoard);
+      if (overallWinner) {
+        setGameWinner(overallWinner);
+        setToastMessage(`Victory for ${overallWinner}! Game over.`);
+        return;
+      }
+    }
+
+    setNextPlayer(nextPlayer === "X" ? "O" : "X");
+    setActiveBoard(bigBoard[squareIndex] ? null : squareIndex);
+    setToastMessage(`Next turn: ${nextPlayer === "X" ? "O" : "X"}`);
+  };
+
+  const resetGame = () => {
+    setBoards(Array(9).fill(Array(9).fill(null)));
+    setBigBoard(Array(9).fill(null));
+    setNextPlayer("X");
+    setActiveBoard(null);
+    setGameWinner(null);
+    setToastMessage("");
+  };
+
+  const resetScores = () => {
+    setScores({ X: 0, O: 0 });
+  };
 
   return (
     <div className="game">
-      <div className="game-board">
-        <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
-        <button onClick={restartGame}>Restart Game</button>
+      {toastMessage && <div className="toast">{toastMessage}</div>}
+
+      <div className="scoreboard">
+        <table>
+          <thead>
+            <tr>
+              <th>Player</th>
+              <th>Games Won</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>X</td>
+              <td>{scores.X}</td>
+            </tr>
+            <tr>
+              <td>O</td>
+              <td>{scores.O}</td>
+            </tr>
+          </tbody>
+        </table>
+        <button onClick={resetScores}>Reset Scores</button>
       </div>
-      <div className="game-info">
-        <div>
-          <h2>Wins</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>X</th>
-                <th>O</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>{xWins}</td>
-                <td>{oWins}</td>
-              </tr>
-            </tbody>
-          </table>
-          <button onClick={resetTable}>Reset Table</button>
+
+      <div className="game-container">
+        <div className="super-board">
+          {bigBoard.map((winner, boardIndex) => (
+            <div
+              key={boardIndex}
+              className={`small-board ${winner ? "won" : ""}`}
+            >
+              {winner ? (
+                <span className="big-winner">{winner}</span>
+              ) : (
+                boards[boardIndex].map((square, squareIndex) => (
+                  <button
+                    key={squareIndex}
+                    className="square"
+                    onClick={() => handleClick(boardIndex, squareIndex)}
+                    disabled={square || gameWinner}
+                  >
+                    {square}
+                  </button>
+                ))
+              )}
+            </div>
+          ))}
+        </div>
+
+        <div className="game-actions">
+          {gameWinner && (
+            <div className="game-over">
+              <h2>{toastMessage}</h2>
+              <button onClick={resetGame}>Restart Game</button>
+            </div>
+          )}
+          <button onClick={resetGame} className="reset-button">
+            Reset Game
+          </button>
         </div>
       </div>
     </div>
   );
 }
 
-function calculateWinner(squares) {
-  const lines = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6],
-  ];
-  for (let i = 0; i < lines.length; i++) {
-    const [a, b, c] = lines[i];
-    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return squares[a];
-    }
-  }
-  return null;
-}
+export default App;
