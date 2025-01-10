@@ -98,7 +98,7 @@ body {
   body {
     min-height: unset;
     height: 100%;
-    padding: 10px 0;
+    padding: 15px 0;
   }
 
   .game {
@@ -109,10 +109,10 @@ body {
   .square {
     background: #fff;
     border: 1px solid #999;
-    font-size: 16px;
+    font-size: 24px;
     font-weight: bold;
-    width: 24px;
-    height: 24px;
+    width: 36px;
+    height: 36px;
     color: grey;
     display: flex;
     justify-content: center;
@@ -125,47 +125,46 @@ body {
   .small-board {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 2px;
+    gap: 3px;
     border: 2px solid #333;
-    padding: 2px;
+    padding: 3px;
     background-color: #eee;
     position: relative;
-    width: 84px;
-    height: 84px;
+    width: 126px;
+    height: 126px;
   }
 
   .super-board {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 4px;
+    gap: 6px;
     background-color: #a3a0a0;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    padding: 8px;
+    padding: 12px;
     border-radius: 8px;
     width: fit-content;
-    margin: 10px auto;
+    margin: 15px auto;
   }
 
   .scoreboard {
     position: static;
     width: 100%;
-    max-width: 280px;
+    max-width: 420px;
     margin: 0 auto;
-    padding: 10px;
+    padding: 15px;
   }
 
   .toast {
     position: fixed;
-    bottom: 10px;
+    bottom: 15px;
     top: auto;
     right: 50%;
     transform: translateX(50%);
-    font-size: 14px;
+    font-size: 18px;
     white-space: nowrap;
-    padding: 8px 16px;
+    padding: 12px 24px;
   }
 }
-
 /* Shared Styles - Unchanged */
 .square:hover {
   background: #ddd;
