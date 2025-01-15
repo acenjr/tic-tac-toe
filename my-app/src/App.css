@@ -24,7 +24,52 @@ body {
   align-items: center;
 }
 
-/* Desktop Styles - Unchanged */
+/* Game Controls */
+.game-controls {
+  margin-bottom: 15px;
+  display: flex;
+  gap: 10px;
+}
+
+.mode-select,
+.difficulty-select {
+  padding: 8px;
+  background-color: #444;
+  color: #ddd;
+  border: 1px solid #777;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.mode-select:hover,
+.difficulty-select:hover {
+  background-color: #555;
+}
+
+/* Active Board Pulsing Animation */
+@keyframes activeBoardPulse {
+  0% {
+    background-color: #aeacac;
+    box-shadow: 0 0 0 rgba(128, 128, 128, 0.4);
+  }
+
+  50% {
+    background-color: #bfbdbd;
+    box-shadow: 0 0 20px rgba(128, 128, 128, 0.6);
+  }
+
+  100% {
+    background-color: #838080;
+    box-shadow: 0 0 0 rgba(128, 128, 128, 0.4);
+  }
+}
+
+.small-board.active-board {
+  animation: activeBoardPulse 2s ease-in-out infinite;
+}
+
+/* Desktop Styles */
 @media (min-width: 401px) {
   .square {
     background: #fff;
@@ -37,7 +82,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: background 0.3s ease-in-out;
+    /* transition: background 0.3s ease-in-out; */
     padding: 0;
     margin: 0;
   }
@@ -52,6 +97,7 @@ body {
     position: relative;
     width: 180px;
     height: 180px;
+    transition: background-color 0.3s ease;
   }
 
   .super-board {
@@ -93,7 +139,7 @@ body {
   }
 }
 
-/* Mobile Styles - Modified for compact layout */
+/* Mobile Styles */
 @media (max-width: 600px) {
   body {
     min-height: unset;
@@ -132,6 +178,7 @@ body {
     position: relative;
     width: 126px;
     height: 126px;
+    transition: background-color 0.3s ease;
   }
 
   .super-board {
@@ -164,8 +211,14 @@ body {
     white-space: nowrap;
     padding: 12px 24px;
   }
+
+  .game-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
-/* Shared Styles - Unchanged */
+
+/* Shared Styles */
 .square:hover {
   background: #ddd;
 }
@@ -181,11 +234,11 @@ body {
 
 @keyframes blink {
   0% {
-    background-color: #585b59;
+    background-color: #393939;
   }
 
   100% {
-    background-color: #525352;
+    background-color: #242424;
   }
 }
 
@@ -203,14 +256,6 @@ body {
   justify-content: center;
   align-items: flex-start;
   width: 100%;
-}
-
-.game-actions {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
 }
 
 .game-over {
@@ -291,3 +336,4 @@ th {
     font-size: 2em;
   }
 }
+
